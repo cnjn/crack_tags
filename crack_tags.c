@@ -3,17 +3,11 @@
 #endif
 
 #include <stdlib.h>
-#include <err.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <string.h>
-#include <strings.h>
-#include <unistd.h>
+#include<string.h>
 #include <stdio.h>
 #include <nfc/nfc.h>
-#include <freefare.h>
-#include "mifare.h"
-#include "nfc-utils.h"
+#include <unistd.h>
+#include "mifare.c"
 
 static mifare_param mp;
 static nfc_device *pnd;
@@ -27,6 +21,19 @@ const nfc_modulation nmMifare = {
     .nmt = NMT_ISO14443A,
     .nbr = NBR_106,
 };
+
+void
+print_hex(const uint8_t *pbtData, const size_t szBytes)
+{
+  size_t  szPos;
+
+  for (szPos = 0; szPos < szBytes; szPos++) {
+    printf("%02x  ", pbtData[szPos]);
+  }
+  printf("\n");
+}
+
+
 
 void init(void){
     nfc_init(&context);
