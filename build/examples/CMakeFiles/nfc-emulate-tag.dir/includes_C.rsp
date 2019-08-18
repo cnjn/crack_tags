@@ -1,0 +1,1 @@
+-IF:/cracl/libnfc-1.7.1/contrib/win32 -IF:/cracl/libnfc-1.7.1 -IF:/cracl/libnfc-1.7.1/include -IF:/cracl/pcre-7.0-bin/include -IF:/cracl/libnfc-1.7.1/drivers -IF:/cracl/libusb-win32-bin-1.2.6.0/include -IF:/cracl/libnfc-1.7.1/examples/../libnfc 

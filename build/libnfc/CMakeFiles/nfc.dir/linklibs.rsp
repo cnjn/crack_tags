@@ -1,0 +1,1 @@
+F:/cracl/libusb-win32-bin-1.2.6.0/lib/gcc/libusb.a -lwsock32 F:/cracl/pcre-7.0-bin/lib/libpcre.dll.a -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 

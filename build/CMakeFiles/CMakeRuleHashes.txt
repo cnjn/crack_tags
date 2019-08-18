@@ -1,0 +1,3 @@
+# Hashes of file build rules.
+ae436fb264bda3418681664dbe7982d3 libnfc/CMakeFiles/win32lib
+c2a7ecef97ff6b14e0f2f267fef8f740 libnfc/libnfc.lib

@@ -1,0 +1,35 @@
+#include "windows.h"
+
+1 VERSIONINFO
+ FILEVERSION 1,7,1,0
+ PRODUCTVERSION 1,7,1,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS VS_FF_DEBUG|VS_FF_PRERELEASE
+#else
+ FILEFLAGS 0L
+#endif
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE VFT_APP
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4" 
+        BEGIN
+            VALUE "Comments", "libnfc utility\0"
+            VALUE "CompanyName", "libnfc.org\0"
+            VALUE "FileDescription", "\0"
+            VALUE "FileVersion", "1.7.1.0\0"
+            VALUE "InternalName", "nfc-mfultralight release\0"
+            VALUE "LegalCopyright", "Copyright (C) 15 Ö\0"
+            VALUE "OriginalFilename", "nfc-mfultralight.exe\0"
+            VALUE "ProductName", "libnfc release\0"
+            VALUE "ProductVersion", "1.7.1.0\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1252
+    END
+END
